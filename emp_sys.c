@@ -74,7 +74,7 @@ void add_new_data(){
 		exit(1);
 	}
 	printf("+----------------------------+\n");
-	printf("|     Add New Infomation     |\n");
+	printf("|        Add New Data        |\n");
 	printf("+----------------------------+\n");
 	do{
 		write_data(fp);
@@ -96,7 +96,7 @@ void delete_data(){
 		exit(1);
 	}
 	printf("+----------------------------+\n");
-	printf("|      Delete Employee       |\n");
+	printf("|        Delete Data         |\n");
 	printf("+----------------------------+\n");
 	view_all_emp(fp, &record, &count, 0);
 	printf("\n");

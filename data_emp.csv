@@ -1,0 +1,5 @@
+EmployeeID,FirstName,LastName,Gender,Age,Phone,Position,Salary,Address
+HR0001,Tony,Stark,Male,45,0988989890,Electrical Enginee,100000.000000,New York
+HR0002,Peter,Parker,Male,25,0987654321,Photographer,25000.000000,New York
+HR0003,Steve,Rogers,Male,80,0888888880,Soldier,0.000000,Brooklyn
+HR0004,Thor,Odinson,Male,1000,0999999990,God,0.000000,Asgard

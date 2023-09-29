@@ -3,20 +3,8 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <ctype.h>
-//main function
-void add_new_data();
-void delete_data();
-void edit_data();
-void search_data();
-void show_all_data();
-void import_2csv();
-//sub function
-void write_data(FILE *file_pointer);
-void read_data();
-void remove_new_line();
-void view_all_emp(FILE *file_pointer, int *record, int *count, int mode);
 
-typedef struct{
+typedef struct Node{
 	char emp_id[10];
 	char first_name[20];
 	char last_name[20];
@@ -26,8 +14,73 @@ typedef struct{
 	char address[100];
 	int age;
 	float salary;
-}INFO;
-INFO new_employee;
+	struct Node *next;
+}Node;
+Node new_employee;
+Node *head = NULL;
+
+//main function
+void add_new_data();
+void delete_data();
+void edit_data();
+void search_data();
+void show_all_data();
+void import_2csv();
+//sub function
+void write_data(FILE *file_pointer);
+void remove_new_line();
+
+void show_all(Node *head_ref){
+	while(head_ref != NULL){
+		printf("ID         : %s\n", head_ref->emp_id);
+		printf("First Name : %s\n", head_ref->first_name);
+		printf("Last Name  : %s\n", head_ref->last_name);
+		printf("Gender     : %s\n", head_ref->gender);
+		printf("Age        : %d years old\n", head_ref->age);
+		printf("Phone      : %s\n", head_ref->phone);			
+		printf("Position   : %s\n", head_ref->position);			
+		printf("Salary     : %.2f Bath\n", head_ref->salary);
+		printf("Address    : %s\n\n", head_ref->address);
+		head_ref = head_ref->next;
+	}
+}
+
+void collect_data(Node *head_ref){
+	strcpy(head_ref->emp_id, new_employee.emp_id);
+	strcpy(head_ref->first_name, new_employee.first_name);
+	strcpy(head_ref->last_name, new_employee.last_name);
+	strcpy(head_ref->gender, new_employee.gender);
+	head_ref->age = new_employee.age;
+	strcpy(head_ref->phone, new_employee.phone);
+	strcpy(head_ref->position, new_employee.position);
+	head_ref->salary = new_employee.salary;
+	strcpy(head_ref->address, new_employee.address);
+	head_ref->next = NULL;
+}
+
+void read_data(Node *head_ref){
+	int count=0;
+	FILE *fp = fopen("data_emp.dat", "rb");
+	while(fread(&new_employee, sizeof(Node), 1, fp)){
+		if(head_ref == NULL){
+			head_ref = (Node*)malloc(sizeof(Node));
+			collect_data(head_ref);
+			head = head_ref;
+		}else{
+			while(head_ref->next != NULL){
+				head_ref = head_ref->next;
+			}
+			head_ref->next = (Node*)malloc(sizeof(Node));
+			collect_data(head_ref->next);
+		}
+		count++;
+	}
+	fclose(fp);
+	printf("+----------------------------+\n");
+	printf("|         Found %3d          |\n", count);
+	printf("+----------------------------+\n");
+	show_all(head);
+}
 
 int main(){
 	int choice=0;
@@ -57,7 +110,7 @@ int main(){
 			case 2:	delete_data(); break;
 			case 3: edit_data(); break;
 			case 4: search_data(); break;
-			case 5: show_all_data(); break;
+			case 5: read_data(head); break;
 			case 6: import_2csv(); break;
 			case 7: printf("Exiting the program..."); break;
 			default: printf("Please select only number in 1-7\n\n");
@@ -98,7 +151,7 @@ void delete_data(){
 	printf("+----------------------------+\n");
 	printf("|        Delete Data         |\n");
 	printf("+----------------------------+\n");
-	view_all_emp(fp, &record, &count, 0);
+	// view_all_emp(fp, &record, &count, 0);
 	printf("\n");
 	if(count != 0){
 		while(1){
@@ -150,7 +203,7 @@ void edit_data(){
 	while(fread(&new_employee, sizeof(new_employee), 1, fp) == 1){
 		if(strcmp(id, new_employee.emp_id) == 0){
 			printf("\nCurrent data!\n");
-			read_data();			
+			// read_data();			
 			printf("Are you sure for edit data (Y/N) : ");
 			answer = getche();
 			printf("\n");
@@ -199,38 +252,13 @@ void search_data(){
 			break;
 		}
 		if(strcmp(id, new_employee.emp_id) == 0){
-			read_data();
+			// read_data();
 			break;
 		}
 	}
 	if(strcmp(id, new_employee.emp_id) != 0){
 		printf("Not found!\n\n");
 	}
-	fclose(fp);
-}
-
-void show_all_data(){
-	int record=0, count=0;
-	FILE *fp = fopen("data_emp.dat", "rb");
-	if(fp == NULL){
-		printf("Can't open this file : data_emp.dat\n");
-		exit(1);
-	}
-	printf("+----------------------------+\n");
-	printf("|       Show All Data        |\n");
-	printf("+----------------------------+\n");
-	view_all_emp(fp, &record, &count, 1);
-	printf("+----------------------------+\n");
-	if(count != 0){
-		if(count > 1){
-			printf("|         Found %3d !        |\n", count);
-		}else{
-			printf("|         Found 1 !          |\n");
-		}
-	}else{
-		printf("|        Not found !         |\n");
-	}
-	printf("+----------------------------+\n");
 	fclose(fp);
 }
 
@@ -290,35 +318,9 @@ void remove_new_line(char *word){
 	word[length-1] = '\0';
 }
 
-void read_data(){
-	printf("ID         : %s\n", new_employee.emp_id);
-	printf("First Name : %s\n", new_employee.first_name);
-	printf("Last Name  : %s\n", new_employee.last_name);
-	printf("Gender     : %s\n", new_employee.gender);
-	printf("Age        : %d years old\n", new_employee.age);
-	printf("Phone      : %s\n", new_employee.phone);			
-	printf("Position   : %s\n", new_employee.position);			
-	printf("Salary     : %.2f Bath\n", new_employee.salary);
-	printf("Address    : %s\n\n", new_employee.address);	
-}
-
-void view_all_emp(FILE *file_pointer, int *record, int *count, int mode){
-	while(fread(&new_employee, sizeof(new_employee), 1, file_pointer) == 1){
-		if(ferror(file_pointer)){
-			printf("Error in reading from file : data_emp.dat\n\n");
-			exit(1);
-		}
-		if(feof(file_pointer)){ 
-			break;
-		}
-		++(*record);
-		if(strcmp(new_employee.emp_id, "\0") != 0){
-			if(mode == 0){
-				printf("Record no. %3d : %s\n", *record, new_employee.first_name);
-			}else{
-				read_data();
-			}
-			(*count)++;
-		}
-	}
-}
+/*
+fix bug when add new data -> show all data 
+fix function delete
+fix function edit
+fix function search
+*/

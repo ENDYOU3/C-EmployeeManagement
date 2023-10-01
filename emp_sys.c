@@ -20,7 +20,6 @@ Node new_employee;
 Node *head = NULL;
 
 //main function
-void delete_data();
 void edit_data();
 void import_2csv();
 
@@ -32,7 +31,6 @@ void remove_new_line(char *word){
 
 void write_data(FILE *file_pointer){
 	char tmp_enter;
-	Node *new_data = (Node*)malloc(sizeof(Node));
 	printf("Employee ID : "); fgets(new_employee.emp_id, 10, stdin); remove_new_line(new_employee.emp_id);
 	printf("First Name  : "); fgets(new_employee.first_name, 20, stdin); remove_new_line(new_employee.first_name);
 	printf("Last Name   : "); fgets(new_employee.last_name, 20, stdin); remove_new_line(new_employee.last_name);
@@ -42,7 +40,7 @@ void write_data(FILE *file_pointer){
 	printf("Position    : "); fgets(new_employee.position, 20, stdin); remove_new_line(new_employee.position);
 	printf("Salary      : "); scanf("%f", &(new_employee.salary)); scanf("%c", &tmp_enter);
 	printf("Address     : "); fgets(new_employee.address, 100, stdin); remove_new_line(new_employee.address);
-	fwrite(&new_employee, sizeof(new_employee), 1, file_pointer);
+	fwrite(&new_employee, sizeof(Node), 1, file_pointer);
 	if(ferror(file_pointer)){
 		printf("Error in writing from file : data_emp.dat\n\n");
 		exit(1);
@@ -52,7 +50,7 @@ void write_data(FILE *file_pointer){
 void add_new_data(){
 	char answer;
 	FILE *fp = fopen("data_emp.dat", "ab");
-	if(fp == NULL){
+	if(!fp){
 		printf("Can't open this file : data_emp.dat\n");
 		exit(1);
 	}
@@ -62,7 +60,7 @@ void add_new_data(){
 	do{
 		write_data(fp);
 		printf("Add new contact complete!\n\n");
-	 	printf("Add contact more (Press any key) or Exit home (Press \'e\') : ");
+	 	printf("Add contact more? (Press any key or \'e\' to exit) : ");
 	 	answer = getche();
 		printf("\n\n");
 	}while(tolower(answer) != 'e');
@@ -80,6 +78,8 @@ void show_info(Node *head_ref){
 	printf("| Address : %-16s |\n", head_ref->address);
 	printf("| Salary  : %-9.2f Bath %2s|\n", head_ref->salary, " ");
 	printf("+----------------------------+\n");
+	printf("| adr. %p -> %p  |\n", head_ref, head_ref->next);
+	printf("+----------------------------+\n");
 }
 
 void collect_data(Node *head_ref){
@@ -95,77 +95,148 @@ void collect_data(Node *head_ref){
 	head_ref->next = NULL;
 }
 
-int read_data(){
-	int count=0;
-	Node *new_node, *last;
-	FILE *fp = fopen("data_emp.dat", "rb");
-	head = NULL;
-	if(fp == NULL){
+int read_data(Node **head_ref, FILE *file_pointer){
+	int count = 0;
+	Node *current, *prev;
+	if(!file_pointer){
 		printf("Can't open this file : data_emp.dat\n");
-		exit(1);	
+		exit(1);
 	}
-	while(fread(&new_employee, sizeof(Node), 1, fp)){
-		new_node = (Node*)malloc(sizeof(Node));
-		last = head;
-		collect_data(new_node);
-		if(head == NULL){
-			head = new_node;
+	*head_ref = NULL;
+	while(fread(&new_employee, sizeof(Node), 1, file_pointer)){
+		current = (Node*)malloc(sizeof(Node));
+		prev = *head_ref;
+		collect_data(current);
+		if(!(*head_ref)){
+			*head_ref = current;
 		}else{
-			while(last->next != NULL){
-				last = last->next;
+			while(prev->next){
+				prev = prev->next;
 			}
-			last->next = new_node;
+			prev->next = current;
 		}
-		if(ferror(fp)){
+		if(ferror(file_pointer)){
 			printf("Error in reading from file : data_emp.dat\n\n");
 			exit(1);
 		}
 		count++;
 	}
-	fclose(fp);
 	return count;
 }
 
 void show_all_data(){
 	int count;
-	count = read_data();
-	if(count != 0){
+	Node *head_ref;
+	FILE *fp = fopen("data_emp.dat", "rb");
+	if(count = read_data(&head, fp)){
+		head_ref = head;
 		printf("+----------------------------+\n");
 		printf("|         Found %3d          |\n", count);
 		printf("+----------------------------+\n");
-		while(head != NULL){
-			show_info(head);
-			head = head->next;
+		while(head_ref){
+			show_info(head_ref);
+			head_ref = head_ref->next;
 		}
 		printf("\n");
 	}else{
 		printf("It's empty!\n");
 	}
+	fclose(fp);
+}
+
+int search_by_id(Node *current, char key[10]){
+	while(current){
+		if(!(strcmp(current->emp_id, key))){
+			printf("%10sFound it!%10s\n", " ", " ");
+			show_info(current);
+			printf("\n");
+			return 1;
+		}
+		current = current->next;
+	}
+	printf("%10sNot Found!%10s\n\n", " ", " ");
+	return 0;
 }
 
 void search_data(){
-	int count;
 	char key[10];
-	Node *current ;
+	Node *current;
+	FILE *fp = fopen("data_emp.dat", "rb");
+	read_data(&head, fp);
+	current = head;
 	printf("+----------------------------+\n");
 	printf("|     Search Data By ID      |\n");
 	printf("+----------------------------+\n\n");
 	printf("Enter id for search : "); fgets(key, 10, stdin); remove_new_line(key);
 	printf("\n");
-	count = read_data();
+	search_by_id(current, key);
+	fclose(fp);
+}
+
+// void update_data(){
+// 	FILE *fp = fopen("data_emp.dat", "rb+");
+// 	if(!fp){
+// 		printf("Can't open this file : data_emp.dat\n");
+// 		exit(1);
+// 	}
+// 	collect_data(head);
+// 	fwrite(&head, sizeof(Node), 1, fp);
+// 	if(ferror(fp)){
+// 		printf("Error in writing from file : data_emp.dat\n\n");
+// 		exit(1);
+// 	}
+// 	fclose(fp);
+// }
+
+void delete_by_id(Node **current, char key[10]){
+	Node *prev;
+	if(strcmp((*current)->emp_id, key)){
+		while(strcmp((*current)->emp_id, key)){
+			prev = *current;
+			*current = (*current)->next;
+		}
+		prev->next = (*current)->next;
+		free(*current);
+	}else{
+		head = (*current)->next;
+		free(*current);
+	}
+}
+
+void delete_data(){
+	char key[10], answer;
+	Node *current;
+	FILE *fp = fopen("data_emp.dat", "rb+");
+	read_data(&head, fp);
 	current = head;
-	while(current != NULL){
-		if(strcmp(current->emp_id, key) == 0){
-			printf("+----------------------------+\n");
-			printf("|         Found it!          |\n");
-			printf("+----------------------------+\n");
-			show_info(current);
+	printf("+----------------------------+\n");
+	printf("|        Delete Data         |\n");
+	printf("+----------------------------+\n");
+	printf("Enter id for delete : "); fgets(key, 10, stdin); remove_new_line(key);
+	printf("\n");
+	if(!(search_by_id(current, key))){
+		return;
+	}
+	while(1){
+		printf("Are you sure? (Y/N) : "); answer = getche(); printf("\n");
+		if(toupper(answer) == 'Y'){
+			delete_by_id(&current, key);
+
+			// while(head){
+			// 	show_info(head);
+			// 	// update_data();
+			// 	head = head->next;
+			// }
+
+			printf("Deleted complete!\n");
+			break;
+		}else if(toupper(answer) == 'N'){
 			printf("\n");
 			break;
+		}else{
+			printf("Please choose 'Y' or 'N' only!\n");
 		}
-		current = current->next;
 	}
-	printf("Not Found!\n\n");
 }
 
 int main(){
@@ -203,54 +274,6 @@ int main(){
 		}
 	} while(choice != 7);
 	return 0;
-}
-
-void delete_data(){
-	int record=0, count=0;
-	char answer;
-	char num_record[5];
-	FILE *fp = fopen("data_emp.dat", "rb+");
-	if(fp==NULL){
-		printf("Can't open this file : data_emp.dat\n");
-		exit(1);
-	}
-	printf("+----------------------------+\n");
-	printf("|        Delete Data         |\n");
-	printf("+----------------------------+\n");
-	// view_all_emp(fp, &record, &count, 0);
-	printf("\n");
-	if(count != 0){
-		while(1){
-			printf("Are you sure delete contact (y/n) : ");
-			answer = getche();
-			printf("\n");
-			if(toupper(answer) == 'Y'){
-				printf("Enter record number for delete : "); fgets(num_record, 5, stdin);
-				if(atoi(num_record) < 1 || atoi(num_record) > record){
-					printf("Not found!\n");
-				}else{
-					fseek(fp, (atoi(num_record)-1)*sizeof(new_employee), SEEK_SET);
-					strcpy(new_employee.emp_id, "\0");
-					fwrite(&new_employee, sizeof(new_employee), 1, fp);
-					if(ferror(fp)){
-						printf("Error in writer from file : data_emp.dat\n\n");
-						exit(1);
-					}else{
-						printf("Delete record : %d complete!\n",atoi(num_record));
-					}
-					break;
-				}
-			}else if(toupper(answer) == 'N'){
-				printf("\n");
-				break;
-			}else{
-				printf("Please enter Y or N only!\n");
-			}
-		}
-	}else{
-		printf("All contact already to delete!\n");
-	}
-	fclose(fp);
 }
 
 void edit_data(){
@@ -316,7 +339,7 @@ void import_2csv(){
 		if(feof(fp)){
 			break;
 		}							
-		fprintf(fp_csv, "%s,%s,%s,%s,%d,%s,%s,%f,%s\n", new_employee.emp_id, new_employee.first_name, new_employee.last_name, new_employee.gender, new_employee.age, new_employee.phone, new_employee.position, new_employee.salary, new_employee.address);
+		fprintf(fp_csv, "%s,%s,%s,%s,%d,%s,%s,%.2f,%s\n", new_employee.emp_id, new_employee.first_name, new_employee.last_name, new_employee.gender, new_employee.age, new_employee.phone, new_employee.position, new_employee.salary, new_employee.address);
 		if(ferror(fp_csv)){
 			printf("Error in writing from file : context.csv\n\n");
 			exit(1);

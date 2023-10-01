@@ -1,5 +1,7 @@
 EmployeeID,FirstName,LastName,Gender,Age,Phone,Position,Salary,Address
-HR0001,Tony,Stark,Male,45,0988989890,Electrical Enginee,100000.000000,New York
-HR0002,Peter,Parker,Male,25,0987654321,Photographer,25000.000000,New York
-HR0003,Steve,Rogers,Male,80,0888888880,Soldier,0.000000,Brooklyn
-HR0004,Thor,Odinson,Male,1000,0999999990,God,0.000000,Asgard
+HR0001,Natdanai,Kladjarean,Male,27,0999998899,Software Engineer,30000.00,Thailand
+HR0002,Peter,Parker,Male,26,0999999990,Engineer,28000.00,New York
+HR0003,Tony,Stark,Male,45,0998989890,Head Engineer,100000.00,New York
+HR0004,Sherlock,Holmes,Male,35,0988767889,Detective,80000.00,England
+HR0005,Lisa,BlackPink,Female,27,0987654321,Korean,100000.00,Thailand
+HR0006,Steve,Rogers,Male,100,-,Soilder,0.00,New York

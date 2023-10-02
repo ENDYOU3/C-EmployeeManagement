@@ -173,33 +173,54 @@ void search_data(){
 	fclose(fp);
 }
 
-// void update_data(){
-// 	FILE *fp = fopen("data_emp.dat", "rb+");
-// 	if(!fp){
-// 		printf("Can't open this file : data_emp.dat\n");
-// 		exit(1);
-// 	}
-// 	collect_data(head);
-// 	fwrite(&head, sizeof(Node), 1, fp);
-// 	if(ferror(fp)){
-// 		printf("Error in writing from file : data_emp.dat\n\n");
-// 		exit(1);
-// 	}
-// 	fclose(fp);
-// }
+void get_data(Node *current, FILE *file_pointer){
+	memset(&new_employee, 0, sizeof(Node));
+	strcpy(new_employee.emp_id, current->emp_id);
+	strcpy(new_employee.first_name, current->first_name);
+	strcpy(new_employee.last_name, current->last_name);
+	strcpy(new_employee.gender, current->gender);
+	new_employee.age = current->age;
+	strcpy(new_employee.phone, current->phone);
+	strcpy(new_employee.position, current->position);
+	new_employee.salary = current->salary;
+	strcpy(new_employee.address, current->address);
+	fwrite(&new_employee, sizeof(Node), 1, file_pointer);
+	if(ferror(file_pointer)){
+		printf("Error in writing from file : data_emp.dat\n\n");
+		exit(1);
+	}
+}
 
-void delete_by_id(Node **current, char key[10]){
+void update_data(Node *current){
+	FILE *fp = fopen("data_emp.dat", "wb");
+	if(!fp){
+		printf("Can't open this file : data_emp.dat\n");
+		exit(1);
+	}
+	while(current){
+		get_data(current, fp);
+		// fwrite(&current, sizeof(Node), 1, fp);
+		current = current->next;
+	}
+	if(ferror(fp)){
+		printf("Error in writing from file : data_emp.dat\n\n");
+		exit(1);
+	}
+	fclose(fp);
+}
+
+void delete_by_id(Node *current, char key[10]){
 	Node *prev;
-	if(strcmp((*current)->emp_id, key)){
-		while(strcmp((*current)->emp_id, key)){
-			prev = *current;
-			*current = (*current)->next;
+	if(strcmp((current)->emp_id, key)){
+		while(strcmp((current)->emp_id, key)){
+			prev = current;
+			current = (current)->next;
 		}
-		prev->next = (*current)->next;
-		free(*current);
+		prev->next = (current)->next;
+		free(current);
 	}else{
-		head = (*current)->next;
-		free(*current);
+		head = (current)->next;
+		free(current);
 	}
 }
 
@@ -220,13 +241,10 @@ void delete_data(){
 	while(1){
 		printf("Are you sure? (Y/N) : "); answer = getche(); printf("\n");
 		if(toupper(answer) == 'Y'){
-			delete_by_id(&current, key);
+			delete_by_id(current, key);
 
-			// while(head){
-			// 	show_info(head);
-			// 	// update_data();
-			// 	head = head->next;
-			// }
+			update_data(current);
+
 
 			printf("Deleted complete!\n");
 			break;

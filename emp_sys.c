@@ -291,7 +291,7 @@ void edit_data(){
 	}
 }
 
-void import_2csv(){
+void export_2csv(){
 	FILE *fp = fopen("data_emp.dat", "rb");
 	FILE *fp_csv = fopen("data_emp.csv", "w");
 	if(fp == NULL){
@@ -317,8 +317,8 @@ void import_2csv(){
 			exit(1);
 		}
 	}
-	printf("Importing...\n");
-	printf("Import file to .csv complete!\n\n");
+	printf("Exporting...\n");
+	printf("Exported file to .csv complete!\n\n");
 	fclose(fp);
 	fclose(fp_csv);
 }
@@ -334,12 +334,12 @@ int main(){
 		printf("+-----------------------------+\n");
 		printf("|            Menu             |\n");
 		printf("+-----------------------------+\n");
-		printf("|  [1] Add new data           |\n");
+		printf("|  [1] Add new employee       |\n");
 		printf("|  [2] Delete data            |\n");
 		printf("|  [3] Edit data              |\n");
 		printf("|  [4] Search data            |\n");
 		printf("|  [5] Show all data          |\n");
-		printf("|  [6] Import file in .csv    |\n");
+		printf("|  [6] Export file to .csv    |\n");
 		printf("|  [7] Exit program           |\n");
 		printf("+-----------------------------+\n");
 		printf("Select menu : ");
@@ -352,7 +352,7 @@ int main(){
 			case 3: edit_data(); break;
 			case 4: search_data(); break;
 			case 5: show_all_data(); break;
-			case 6: import_2csv(); break;
+			case 6: export_2csv(); break;
 			case 7: printf("Exiting the program..."); break;
 			default: printf("Please select only number in 1-7\n\n");
 		}

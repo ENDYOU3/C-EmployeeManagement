@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "stdio.h": "c",
+        "_mingw_print_push.h": "c",
+        "crtdefs.h": "c",
+        "string.h": "c",
+        "time.h": "c",
+        "type_traits": "c"
     }
 }

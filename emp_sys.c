@@ -19,10 +19,6 @@ typedef struct Node{
 Node new_employee;
 Node *head = NULL;
 
-//main function
-void edit_data();
-void import_2csv();
-
 void remove_new_line(char *word){
 	int length;
 	length = strlen(word);
@@ -79,8 +75,6 @@ void show_info(Node *head_ref){
 	printf("| Tel        : %-14s |\n", head_ref->phone);
 	printf("| Address    : %-14s |\n", head_ref->address);
 	printf("| Salary     : %-9.2f Bath |\n", head_ref->salary);
-	printf("+-----------------------------+\n");
-	printf("| adr. %p -> %p   |\n", head_ref, head_ref->next);
 	printf("+-----------------------------+\n");
 }
 
@@ -141,7 +135,7 @@ void show_all_data(){
 		}
 		printf("\n");
 	}else{
-		printf("It's empty!\n");
+		printf("It's empty!\n\n");
 	}
 	fclose(fp);
 }
@@ -234,15 +228,15 @@ void delete_data(){
 	printf("Enter id for delete : "); fgets(key, 10, stdin); remove_new_line(key);
 	printf("\n");
 	if(!(search_by_id(&current, key))){
-		current = head;
 		return;
 	}
 	while(1){
 		printf("Are you sure? (Y/N) : "); answer = getche(); printf("\n");
 		if(toupper(answer) == 'Y'){
+			current = head;
 			delete_by_id(current, key);
 			update_data(head);
-			printf("Deleted complete!\n");
+			printf("Deleted complete!\n\n");
 			break;
 		}else if(toupper(answer) == 'N'){
 			printf("\n");
@@ -286,7 +280,7 @@ void edit_data(){
 		if(toupper(answer) == 'Y'){
 			edit_value(current);
 			update_data(head);
-			printf("Edit data complete!\n\n");
+			printf("\nEdit data complete!\n\n");
 			break;
 		}else if(toupper(answer) == 'N'){
 			printf("\n");
@@ -297,16 +291,48 @@ void edit_data(){
 	}
 }
 
+void import_2csv(){
+	FILE *fp = fopen("data_emp.dat", "rb");
+	FILE *fp_csv = fopen("data_emp.csv", "w");
+	if(fp == NULL){
+		printf("Can't open this file : data_emp.dat\n");
+		exit(1);
+	}
+	if(fp_csv == NULL){
+		printf("Can't open this file : data_emp.csv\n");
+		exit(1);
+	}
+	fprintf(fp_csv, "%s,%s,%s,%s,%s,%s,%s,%s,%s\n", "EmployeeID","FirstName", "LastName", "Gender", "Age", "Phone", "Position", "Salary", "Address");
+	while(fread(&new_employee, sizeof(Node), 1, fp)){
+		if(ferror(fp)){
+			printf("Error in reading from file : context.dat\n\n");
+			exit(1);
+		}
+		if(feof(fp)){
+			break;
+		}							
+		fprintf(fp_csv, "%s,%s,%s,%s,%d,%s,%s,%f,%s\n", new_employee.emp_id, new_employee.first_name, new_employee.last_name, new_employee.gender, new_employee.age, new_employee.phone, new_employee.position, new_employee.salary, new_employee.address);
+		if(ferror(fp_csv)){
+			printf("Error in writing from file : context.csv\n\n");
+			exit(1);
+		}
+	}
+	printf("Importing...\n");
+	printf("Import file to .csv complete!\n\n");
+	fclose(fp);
+	fclose(fp_csv);
+}
+
 int main(){
 	int choice=0;
 	char tmp_choice;
-	printf("###############################\n");
-	printf("# Employee Management System. #\n");
-	printf("###############################\n");
+	printf("+-----------------------------+\n");
+	printf("|     Employee Management     |\n");
+	printf("|           System            |\n");
 	do{
 		fflush(stdin);
 		printf("+-----------------------------+\n");
-		printf("|             Menu            |\n");
+		printf("|            Menu             |\n");
 		printf("+-----------------------------+\n");
 		printf("|  [1] Add new data           |\n");
 		printf("|  [2] Delete data            |\n");
@@ -333,82 +359,3 @@ int main(){
 	} while(choice != 7);
 	return 0;
 }
-
-// void edit_data(){
-// 	char answer;
-// 	char id[10];
-// 	FILE *fp = fopen("data_emp.dat", "rb+");
-// 	if(fp == NULL){
-// 		printf("Can't open this file : data_emp.dat\n");
-// 		exit(1);
-// 	}
-// 	printf("+----------------------------+\n");
-// 	printf("|          Edit Data         |\n");
-// 	printf("+----------------------------+\n\n");
-// 	printf("Enter id for edit : "); fgets(id, 10, stdin);
-// 	remove_new_line(id);
-// 	while(fread(&new_employee, sizeof(new_employee), 1, fp) == 1){
-// 		if(strcmp(id, new_employee.emp_id) == 0){
-// 			printf("\nCurrent data!\n");
-// 			// read_data();			
-// 			printf("Are you sure for edit data (Y/N) : ");
-// 			answer = getche();
-// 			printf("\n");
-// 			if(toupper(answer) == 'Y'){
-// 				fseek(fp, ftell(fp)-sizeof(new_employee), SEEK_SET);
-// 				printf("\nFill in information\n");
-// 				write_data(fp);
-// 				printf("\nEdit employee id %s complete!\n\n", new_employee.emp_id);
-// 				break;
-// 			}else if(toupper(answer) == 'N'){
-// 				printf("\n");
-// 				break;
-// 			}else{
-// 				printf("Please enter Y or N only!\n");
-// 			}
-// 		}
-// 		if(feof(fp)){
-// 			break;
-// 		}
-// 	}
-// 	if(strcmp(id, new_employee.emp_id) != 0){
-// 		printf("\nNot found!\n\n");
-// 	}
-// 	fclose(fp);
-// }
-
-void import_2csv(){
-	FILE *fp = fopen("data_emp.dat", "rb");
-	FILE *fp_csv = fopen("data_emp.csv", "w");
-	if(fp == NULL){
-		printf("Can't open this file : data_emp.dat\n");
-		exit(1);
-	}
-	if(fp_csv == NULL){
-		printf("Can't open this file : data_emp.csv\n");
-		exit(1);
-	}
-	fprintf(fp_csv, "%s,%s,%s,%s,%s,%s,%s,%s,%s\n", "EmployeeID","FirstName", "LastName", "Gender", "Age", "Phone", "Position", "Salary", "Address");
-	while(fread(&new_employee, sizeof(new_employee), 1, fp) == 1){
-		if(ferror(fp)){
-			printf("Error in reading from file : context.dat\n\n");
-			exit(1);
-		}
-		if(feof(fp)){
-			break;
-		}							
-		fprintf(fp_csv, "%s,%s,%s,%s,%d,%s,%s,%.2f,%s\n", new_employee.emp_id, new_employee.first_name, new_employee.last_name, new_employee.gender, new_employee.age, new_employee.phone, new_employee.position, new_employee.salary, new_employee.address);
-		if(ferror(fp_csv)){
-			printf("Error in writing from file : context.csv\n\n");
-			exit(1);
-		}
-	}
-	printf("Importing...\n");
-	printf("Import file to .csv complete!\n\n");
-	fclose(fp);
-	fclose(fp_csv);
-}
-
-/*
-fix function edit
-*/
